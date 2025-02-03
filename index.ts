@@ -1,28 +1,12 @@
 import fs from 'fs/promises';
 import { nameVerFromPkgSnapshot, pkgSnapshotToResolution } from '@pnpm/lockfile-utils';
-import { readWantedLockfile } from '@pnpm/lockfile-file';
-
-const LATEST_SUPPORTED_PNPM_LOCK_VERSION = 9.0;
-
-export async function parseLockfile(pkgPath: string) {
-  const lock = await readWantedLockfile(pkgPath, { ignoreIncompatible: true });
-  if (lock == null) throw new Error('pnpm lockfile not found');
-
-  if (parseFloat(lock.lockfileVersion) > LATEST_SUPPORTED_PNPM_LOCK_VERSION)
-    console.warn(
-      `Your lockfile version (${lock.lockfileVersion}) is higher than the supported version of pnpm-lock-export (${LATEST_SUPPORTED_PNPM_LOCK_VERSION}).`
-    );
-
-  return lock;
-}
+import { dedicatedLockfile } from './helpers';
 
 async function convertPnpmLockToNpmLock() {
   try {
-    // Read the pnpm-lock.yaml file
-    // const pnpmLockContent = await fs.readFile(pnpmLockPath, 'utf8');
-    // const pnpmLock = yaml.parse(pnpmLockContent);
-
-    const pnpmLock = await parseLockfile('.');
+    // TODO: Make this CLI args
+    const pnpmLock = await dedicatedLockfile('/opt/gitbutler/gitbutler', '/opt/gitbutler/gitbutler');
+    console.log('PNPM LOCK', pnpmLock)
 
     // Initialize package-lock.json structure
     const packageLock = {
@@ -39,23 +23,9 @@ async function convertPnpmLockToNpmLock() {
       // Skip the root package
       if (!pnpmLock.packages || pkgPath === '') continue;
 
-      // Parse package name and version
-      // let [name3, version2] = pkgPath.slice(0).split('@');
-      // let name2 = name3
-      // console.log(pkgPath, name3, version2)
-
-      let { name, version } = nameVerFromPkgSnapshot(pkgPath, pnpmLock.packages[pkgPath]);
-
-      console.log(pkgPath, name, version)
+      const { name, version } = nameVerFromPkgSnapshot(pkgPath, pnpmLock.packages[pkgPath]);
+      if (name.includes('webdriver')) console.log('UNDICI', name, version)
       const resolution = pkgSnapshotToResolution(pkgPath, pnpmLock.packages[pkgPath], { default: 'https://registry.npmjs.org/' });
-      console.log(resolution, '\n')
-      // if (pkgPath.startsWith('@')) {
-      //   const parts = pkgPath.slice(1).split('@');
-      //   name = '@' + parts[0];
-      //   name2 = name.split('/')[1]
-      //   version = parts[1];
-      //   // console.log(pkgPath, name, version)
-      // }
 
       // Create package entry
       const packageEntry = {

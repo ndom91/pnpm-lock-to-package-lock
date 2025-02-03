@@ -14,6 +14,12 @@ importers:
       '@pnpm/lockfile-utils':
         specifier: ^11.0.4
         version: 11.0.4
+      '@pnpm/prune-lockfile':
+        specifier: ^6.1.4
+        version: 6.1.4
+      '@pnpm/types':
+        specifier: ^1000.1.1
+        version: 1000.1.1
       tsx:
         specifier: ^4.19.2
         version: 4.19.2
@@ -1611,11 +1617,19 @@ packages:
     resolution: {integrity: sha512-2eisylRAU/jeuxFEPnS1gjLZKJGbYc4QEtEW6MVUYjO4Xi+2ttkSm7825S0J5IPpUIvln8HYPCUS0eQWSfpOaQ==}
     engines: {node: '>=18.12'}
 
+  '@pnpm/prune-lockfile@6.1.4':
+    resolution: {integrity: sha512-wETbaMMXOQh5RMyvyCTv2E5zA+2cEvW+00+CTxuEW3f/LYFju3rOq1mTCqb31ZncgeIoyscH/Ig63YL7tFC92g==}
+    engines: {node: '>=18.12'}
+
   '@pnpm/ramda@0.28.1':
     resolution: {integrity: sha512-zcAG+lvU0fMziNeGXpPyCyCJYp5ZVrPElEE4t14jAmViaihohocZ+dDkcRIyAomox8pQsuZnv1EyHR+pOhmUWw==}
 
   '@pnpm/resolver-base@13.0.1':
     resolution: {integrity: sha512-WXWHDtVFAmwyBSOLYkYF1bJujDQyG6JYZGsVsy+/dTPiaT8pzebL7p4fchC/8wpZroH7lxJ1lInSKIg7T904/g==}
+    engines: {node: '>=18.12'}
+
+  '@pnpm/types@1000.1.1':
+    resolution: {integrity: sha512-5zrv7B+4mW/6iiYS/BrFZWbMqLHjKmaBrMcw+F8LcuMQ7p4SQX4ANoycpr1VIQpn4+xQ0ckyuadfxBttpzicbg==}
     engines: {node: '>=18.12'}
 
   '@pnpm/types@11.1.0':
@@ -7549,11 +7563,21 @@ snapshots:
 
   '@pnpm/pick-fetcher@3.0.0': {}
 
+  '@pnpm/prune-lockfile@6.1.4':
+    dependencies:
+      '@pnpm/constants': 8.0.0
+      '@pnpm/dependency-path': 5.1.3
+      '@pnpm/lockfile-types': 7.1.3
+      '@pnpm/types': 11.1.0
+      ramda: '@pnpm/ramda@0.28.1'
+
   '@pnpm/ramda@0.28.1': {}
 
   '@pnpm/resolver-base@13.0.1':
     dependencies:
       '@pnpm/types': 11.1.0
+
+  '@pnpm/types@1000.1.1': {}
 
   '@pnpm/types@11.1.0': {}
 
