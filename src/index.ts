@@ -1,29 +1,44 @@
-import fs from 'fs/promises';
-import { nameVerFromPkgSnapshot, pkgSnapshotToResolution, type Resolution } from '@pnpm/lockfile-utils';
-import { dedicatedLockfile } from './lib';
+import fs from "node:fs/promises";
+import {
+  nameVerFromPkgSnapshot,
+  pkgSnapshotToResolution,
+  type Resolution,
+} from "@pnpm/lockfile-utils";
+import { dedicatedLockfile } from "./lib";
 
 async function convertPnpmLockToNpmLock() {
   try {
     // TODO: Make this CLI args
-    const pnpmLock = await dedicatedLockfile('/opt/gitbutler/gitbutler', '/opt/gitbutler/gitbutler');
+    const pnpmLock = await dedicatedLockfile(
+      "/opt/gitbutler/gitbutler",
+      "/opt/gitbutler/gitbutler",
+    );
+    console.log("PNPMLOCK", pnpmLock);
 
     // Initialize package-lock.json structure
     const packageLock = {
-      name: 'gitbutler',
-      version: '1.0.0',
+      name: "gitbutler",
+      version: "1.0.0",
       lockfileVersion: 3,
       requires: true,
       packages: {},
-      dependencies: {}
+      dependencies: {},
     };
 
     // Process each package in the lockfile
     for (const [pkgPath, pkgInfo] of Object.entries(pnpmLock.packages || {})) {
       // Skip the root package
-      if (!pnpmLock.packages || pkgPath === '') continue;
+      if (!pnpmLock.packages || pkgPath === "") continue;
 
-      const { name, version } = nameVerFromPkgSnapshot(pkgPath, pnpmLock.packages[pkgPath]);
-      const resolution = pkgSnapshotToResolution(pkgPath, pnpmLock.packages[pkgPath], { default: 'https://registry.npmjs.org/' });
+      const { name, version } = nameVerFromPkgSnapshot(
+        pkgPath,
+        pnpmLock.packages[pkgPath],
+      );
+      const resolution = pkgSnapshotToResolution(
+        pkgPath,
+        pnpmLock.packages[pkgPath],
+        { default: "https://registry.npmjs.org/" },
+      );
 
       // Create package entry
       const packageEntry = {
@@ -31,7 +46,7 @@ async function convertPnpmLockToNpmLock() {
         resolved: resolution?.tarball,
         integrity: resolution?.integrity,
         requires: pkgInfo.dependencies || {},
-        dependencies: {}
+        dependencies: {},
       };
 
       // Add to packages and dependencies
@@ -39,26 +54,30 @@ async function convertPnpmLockToNpmLock() {
       packageLock.dependencies[name] = {
         version: version,
         resolved: packageEntry.resolved,
-        integrity: packageEntry.integrity
+        integrity: packageEntry.integrity,
       };
 
       // Process dependencies
       if (pkgInfo.dependencies) {
-        for (const [depName, depVersion] of Object.entries(pkgInfo.dependencies)) {
+        for (const [depName, depVersion] of Object.entries(
+          pkgInfo.dependencies,
+        )) {
           packageEntry.dependencies[depName] = {
             version: depVersion,
-            requires: {}
+            requires: {},
           };
         }
       }
     }
 
     // Write the package-lock.json file
-    await fs.writeFile('package-lock.json', JSON.stringify(packageLock, null, 2));
-    console.log('Successfully converted pnpm-lock.yaml to package-lock.json');
-
+    await fs.writeFile(
+      "package-lock.json",
+      JSON.stringify(packageLock, null, 2),
+    );
+    console.log("Successfully converted pnpm-lock.yaml to package-lock.json");
   } catch (error) {
-    console.error('Error converting lock file:', error);
+    console.error("Error converting lock file:", error);
     throw error;
   }
 }

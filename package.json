@@ -4,7 +4,9 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "dev": "tsx src/index.ts"
+    "dev": "tsx src/index.ts",
+    "format": "biome lint --write ./src/*.ts",
+    "lint": "biome format --write ./src/*.ts"
   },
   "keywords": [],
   "author": "ndom91 <yo@ndo.dev> (https://ndo.dev/)",
@@ -12,6 +14,7 @@
   "description": "Util for converting from pnpm lock files to npm lock files (package-lock.json)",
   "packageManager": "pnpm@9.12.0+sha512.4abf725084d7bcbafbd728bfc7bee61f2f791f977fd87542b3579dcb23504d170d46337945e4c66485cd12d588a0c0e570ed9c477e7ccdd8507cf05f3f92eaca",
   "devDependencies": {
+    "@biomejs/biome": "1.9.4",
     "@pnpm/catalogs.resolver": "^1000.0.2",
     "@pnpm/catalogs.types": "^1000.0.0",
     "@pnpm/error": "^1000.0.2",
