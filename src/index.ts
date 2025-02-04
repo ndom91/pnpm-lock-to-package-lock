@@ -1,26 +1,12 @@
 import fs from 'fs/promises';
-import { nameVerFromPkgSnapshot, pkgSnapshotToResolution } from '@pnpm/lockfile-utils';
-import { createExportableManifest, readAndCheckManifest, dedicatedLockfile } from './lib';
-
-function sortObjectByKeys<T>(obj: { [key: string]: T }): { [key: string]: T } {
-  return Object.fromEntries(
-    Object.entries(obj).sort(([a], [b]) => a.localeCompare(b))
-  );
-}
+import { nameVerFromPkgSnapshot, pkgSnapshotToResolution, type Resolution } from '@pnpm/lockfile-utils';
+import { dedicatedLockfile } from './lib';
 
 async function convertPnpmLockToNpmLock() {
   try {
     // TODO: Make this CLI args
     const pnpmLock = await dedicatedLockfile('/opt/gitbutler/gitbutler', '/opt/gitbutler/gitbutler');
-    const sortedPackages = sortObjectByKeys(pnpmLock.packages || {});
-    // console.log('PNPM LOCK', sortedPackages);
-    // console.log('PNPM LOCK.dayjs', sortedPackages['dayjs@1.11.13']);
-    // console.log('PNPM LOCK.^dayjs', sortedPackages['dayjs@^1.11.13']);
 
-    const manifest = await readAndCheckManifest('/opt/gitbutler/gitbutler')
-    const exportableManifest = await createExportableManifest('/opt/gitbutler/gitbutler/', manifest, {})
-    console.log('exportableManifest', exportableManifest);
-    // TODO: use `createExportableManifest`
     // Initialize package-lock.json structure
     const packageLock = {
       name: 'gitbutler',
@@ -37,7 +23,6 @@ async function convertPnpmLockToNpmLock() {
       if (!pnpmLock.packages || pkgPath === '') continue;
 
       const { name, version } = nameVerFromPkgSnapshot(pkgPath, pnpmLock.packages[pkgPath]);
-      if (name.includes('webdriver')) console.log('UNDICI', name, version)
       const resolution = pkgSnapshotToResolution(pkgPath, pnpmLock.packages[pkgPath], { default: 'https://registry.npmjs.org/' });
 
       // Create package entry
