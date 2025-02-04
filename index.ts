@@ -1,6 +1,6 @@
 import fs from 'fs/promises';
 import { nameVerFromPkgSnapshot, pkgSnapshotToResolution } from '@pnpm/lockfile-utils';
-import { dedicatedLockfile } from './helpers';
+import { dedicatedLockfile } from './lib';
 
 async function convertPnpmLockToNpmLock() {
   try {
