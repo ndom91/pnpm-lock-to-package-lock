@@ -1,6 +1,8 @@
 import { getLockfileImporterId, Lockfile, ProjectSnapshot, readWantedLockfile } from '@pnpm/lockfile-file';
 import { overridePublishConfig } from './overridePublishConfig'
+import { PnpmError } from '@pnpm/error'
 import { CatalogResolver, resolveFromCatalog } from '@pnpm/catalogs.resolver'
+import { tryReadProjectManifest } from '@pnpm/read-project-manifest'
 import { Dependencies, DEPENDENCIES_FIELDS, type ProjectId, type ProjectManifest } from '@pnpm/types';
 import { pruneSharedLockfile } from '@pnpm/prune-lockfile';
 import { omit, pMapValues } from './lodash'
@@ -43,13 +45,14 @@ export async function dedicatedLockfile(lockfileDir: string, projectDir: string)
   const allImporters = lockfile.importers
   lockfile.importers = {}
   const baseImporterId = getLockfileImporterId(lockfileDir, projectDir)
-  // console.log('allImporters', allImporters)
+  console.log('allImporters', allImporters)
+  console.log('baseImportedId', baseImporterId)
   for (const [importerId, importer] of Object.entries(allImporters)) {
-    if (importerId.startsWith(`${baseImporterId}/`)) {
-      const newImporterId = importerId.slice(baseImporterId.length + 1) as ProjectId
-      lockfile.importers[newImporterId] = projectSnapshotWithoutLinkedDeps(importer)
-      continue
-    }
+    // if (importerId.startsWith(`${baseImporterId}/`)) {
+    const newImporterId = importerId.slice(baseImporterId.length + 1) as ProjectId
+    lockfile.importers[newImporterId] = projectSnapshotWithoutLinkedDeps(importer)
+    // continue
+    // }
     if (importerId === baseImporterId) {
       lockfile.importers['.' as ProjectId] = projectSnapshotWithoutLinkedDeps(importer)
     }
@@ -73,7 +76,21 @@ function projectSnapshotWithoutLinkedDeps(projectSnapshot: ProjectSnapshot) {
   return newProjectSnapshot;
 }
 
+// From https://github.com/pnpm/pnpm/blob/main/pkg-manifest/exportable-manifest/src/index.ts
+export async function readAndCheckManifest(dependencyDir: string): Promise<ProjectManifest> {
+  const { manifest } = await tryReadProjectManifest(dependencyDir)
+  // console.log('readAndCheckManifest', manifest)
+  if (!manifest?.name) {
+    throw new PnpmError(
+      'CANNOT_RESOLVE_WORKSPACE_PROTOCOL',
+      `Cannot resolve workspace protocol of dependency` +
+      'because this dependency is not installed. Try running "pnpm install".'
+    )
+  }
+  return manifest
+}
 
+// From https://github.com/pnpm/pnpm/blob/main/pkg-manifest/exportable-manifest/src/index.ts
 export async function createExportableManifest(
   dir: string,
   originalManifest: ProjectManifest,

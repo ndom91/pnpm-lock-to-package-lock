@@ -1,7 +1,6 @@
 import fs from 'fs/promises';
 import { nameVerFromPkgSnapshot, pkgSnapshotToResolution } from '@pnpm/lockfile-utils';
-import { dedicatedLockfile } from './lib';
-
+import { createExportableManifest, readAndCheckManifest, dedicatedLockfile } from './lib';
 
 function sortObjectByKeys<T>(obj: { [key: string]: T }): { [key: string]: T } {
   return Object.fromEntries(
@@ -15,10 +14,13 @@ async function convertPnpmLockToNpmLock() {
     const pnpmLock = await dedicatedLockfile('/opt/gitbutler/gitbutler', '/opt/gitbutler/gitbutler');
     const sortedPackages = sortObjectByKeys(pnpmLock.packages || {});
     // console.log('PNPM LOCK', sortedPackages);
-    console.log('PNPM LOCK.dayjs', sortedPackages['dayjs@1.11.13']);
-    console.log('PNPM LOCK.^dayjs', sortedPackages['dayjs@^1.11.13']);
+    // console.log('PNPM LOCK.dayjs', sortedPackages['dayjs@1.11.13']);
+    // console.log('PNPM LOCK.^dayjs', sortedPackages['dayjs@^1.11.13']);
 
-    // TODO: use `createDedicatedManifest`
+    const manifest = await readAndCheckManifest('/opt/gitbutler/gitbutler')
+    const exportableManifest = await createExportableManifest('/opt/gitbutler/gitbutler/', manifest, {})
+    console.log('exportableManifest', exportableManifest);
+    // TODO: use `createExportableManifest`
     // Initialize package-lock.json structure
     const packageLock = {
       name: 'gitbutler',
