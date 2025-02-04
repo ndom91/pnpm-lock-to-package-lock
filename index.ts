@@ -2,12 +2,23 @@ import fs from 'fs/promises';
 import { nameVerFromPkgSnapshot, pkgSnapshotToResolution } from '@pnpm/lockfile-utils';
 import { dedicatedLockfile } from './lib';
 
+
+function sortObjectByKeys<T>(obj: { [key: string]: T }): { [key: string]: T } {
+  return Object.fromEntries(
+    Object.entries(obj).sort(([a], [b]) => a.localeCompare(b))
+  );
+}
+
 async function convertPnpmLockToNpmLock() {
   try {
     // TODO: Make this CLI args
     const pnpmLock = await dedicatedLockfile('/opt/gitbutler/gitbutler', '/opt/gitbutler/gitbutler');
-    console.log('PNPM LOCK', pnpmLock)
+    const sortedPackages = sortObjectByKeys(pnpmLock.packages || {});
+    // console.log('PNPM LOCK', sortedPackages);
+    console.log('PNPM LOCK.dayjs', sortedPackages['dayjs@1.11.13']);
+    console.log('PNPM LOCK.^dayjs', sortedPackages['dayjs@^1.11.13']);
 
+    // TODO: use `createDedicatedManifest`
     // Initialize package-lock.json structure
     const packageLock = {
       name: 'gitbutler',
