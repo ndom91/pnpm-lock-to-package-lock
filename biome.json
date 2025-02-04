@@ -3,7 +3,7 @@
 	"vcs": {
 		"enabled": false,
 		"clientKind": "git",
-		"useIgnoreFile": false
+		"useIgnoreFile": true
 	},
 	"files": {
 		"ignoreUnknown": false,
@@ -11,6 +11,7 @@
 	},
 	"formatter": {
 		"enabled": true,
+		"lineWidth": 120,
 		"indentStyle": "space"
 	},
 	"organizeImports": {
@@ -24,7 +25,8 @@
 	},
 	"javascript": {
 		"formatter": {
-			"quoteStyle": "double"
+			"quoteStyle": "double",
+			"semicolons": "asNeeded"
 		}
 	}
 }

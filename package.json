@@ -5,8 +5,8 @@
   "type": "module",
   "scripts": {
     "dev": "tsx src/index.ts",
-    "format": "biome lint --write ./src/*.ts",
-    "lint": "biome format --write ./src/*.ts"
+    "format": "biome format --fix ./src/*.ts",
+    "lint": "biome lint --fix ./src/*.ts"
   },
   "keywords": [],
   "author": "ndom91 <yo@ndo.dev> (https://ndo.dev/)",
